@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 import hashlib
-import matplotlib.pyplot as plt
-import seaborn as sns
-from io import BytesIO
+import plotly.express as px
 
 # Function to hash a password using SHA-256
 def hash_password(password):
@@ -166,28 +164,28 @@ else:
 
         # Sales trends
         if show_trends:
-            fig_sales, ax_sales = plt.subplots()
-            sns.lineplot(data=filtered_data, x='Date', y='Ventes', hue='Produits_vendus', ax=ax_sales)
-            ax_sales.set_title('Daily Sales by Product')
-            ax_sales.set_xlabel('Date')
-            ax_sales.set_ylabel('Sales')
-            st.pyplot(fig_sales)
+            fig_sales = px.line(
+                filtered_data, x='Date', y='Ventes', color='Produits_vendus', 
+                title='Daily Sales by Product', markers=True, line_shape='spline', color_discrete_sequence=px.colors.qualitative.Set1
+            )
+            fig_sales.update_traces(marker=dict(size=8, line=dict(width=2, color='DarkSlateGrey')))
+            fig_sales.update_layout(title_font_size=18, plot_bgcolor="#f9f9f9")
+            st.plotly_chart(fig_sales, use_container_width=True)
 
         # Visitors comparison
         if show_comparison:
-            fig_visitors, ax_visitors = plt.subplots()
-            sns.barplot(data=filtered_data, x='Date', y='Visiteurs', hue='Produits_vendus', ax=ax_visitors)
-            ax_visitors.set_title('Daily Visitors by Product')
-            ax_visitors.set_xlabel('Date')
-            ax_visitors.set_ylabel('Visitors')
-            st.pyplot(fig_visitors)
+            fig_visitors = px.bar(
+                filtered_data, x='Date', y='Visiteurs', color='Produits_vendus', 
+                title='Daily Visitors by Product', color_discrete_sequence=px.colors.qualitative.Plotly
+            )
+            fig_visitors.update_layout(title_font_size=18, plot_bgcolor="#f9f9f9")
+            st.plotly_chart(fig_visitors, use_container_width=True)
 
         # Revenue distribution
-        fig_revenue, ax_revenue = plt.subplots()
-        revenue_by_product = filtered_data.groupby('Produits_vendus')['Revenus'].sum().reset_index()
-        ax_revenue.pie(revenue_by_product['Revenus'], labels=revenue_by_product['Produits_vendus'], autopct='%1.1f%%', startangle=90)
-        ax_revenue.set_title('Revenue Distribution by Product')
-        st.pyplot(fig_revenue)
+        fig_revenue = px.pie(
+            filtered_data, values='Revenus', names='Produits_vendus', title='Revenue Distribution by Product', color_discrete_sequence=px.colors.sequential.RdBu
+        )
+        st.plotly_chart(fig_revenue)
 
         # Export CSV
         st.download_button(
