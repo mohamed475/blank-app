@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import hashlib
-import plotly.express as px
-
 # Function to hash a password using SHA-256
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
